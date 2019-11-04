@@ -79,13 +79,12 @@ mongoose.connect(db, { useNewUrlParser: true })
     })
 
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../dist")))
+app.use(express.static(path.join(__dirname, "../dist")))
 
-    app.get('*', (req, res, next) => {
-        res.sendFile(path.join(__dirname, "../dist", "index.html"))
-    })
-}
+app.get('*', (req, res, next) => {
+    res.sendFile(path.join(__dirname, "../dist", "index.html"))
+})
+
 
 // port
 const port = process.env.PORT || 3030
