@@ -10,7 +10,7 @@ if (window.localStorage.getItem('user_token') !== null) {
 
 export default () => {
     return axios.create({
-        baseURL: ``,
+        baseURL: `http://localhost:3030/`,
         headers: {
             "Authorization": token,
             "Accept": "application/json",

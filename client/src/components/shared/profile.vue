@@ -42,7 +42,10 @@
           </div>
         </div>
         <div class="profile-img-1" v-if="authUser.image">
-          <img :src="authUser.image" class="img-fluid profile-img-1" alt />
+          <div
+            class="profile-img-1"
+            v-bind:style="{ backgroundImage: 'url(' + authUser.image + ')' }"
+          ></div>
         </div>
 
         <div class="profile-img-1" v-else>
@@ -425,6 +428,8 @@ export default {
   cursor: pointer;
 }
 .profile-img-1 {
+  background-position: center;
+  background-size: cover;
   justify-content: center;
   width: 180px;
   height: 180px;
