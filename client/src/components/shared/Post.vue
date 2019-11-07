@@ -53,7 +53,18 @@
       <section>
         <div class="post-wrapper mb-5" v-for="post in posts" :key="post._id">
           <div class="d-flex flex-row w-100 align-items-center post-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" class="mr-3" viewBox="0 0 53 53">
+            <div
+              v-if="post.author.image"
+              class="style-img mr-3"
+              :style="{ backgroundImage: 'url(' + post.author.image + ')'}"
+            >&nbsp;</div>
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              class="mr-3"
+              viewBox="0 0 53 53"
+            >
               <path
                 d="M18.613 41.552l-7.907 4.313a7.106 7.106 0 0 0-1.269.903A26.377 26.377 0 0 0 26.5 53c6.454 0 12.367-2.31 16.964-6.144a7.015 7.015 0 0 0-1.394-.934l-8.467-4.233a3.229 3.229 0 0 1-1.785-2.888v-3.322c.238-.271.51-.619.801-1.03a19.482 19.482 0 0 0 2.632-5.304c1.086-.335 1.886-1.338 1.886-2.53v-3.546c0-.78-.347-1.477-.886-1.965v-5.126s1.053-7.977-9.75-7.977-9.75 7.977-9.75 7.977v5.126a2.644 2.644 0 0 0-.886 1.965v3.546c0 .934.491 1.756 1.226 2.231.886 3.857 3.206 6.633 3.206 6.633v3.24a3.232 3.232 0 0 1-1.684 2.833z"
                 fill="#e7eced"
@@ -66,7 +77,7 @@
             <div class="post-h1">
               <div class="d-flex flex-column" style="line-height: 18px;">
                 <div class="user-name">{{post.author.firstname}} {{ post.author.lastname}}</div>
-                <div class="time">10 days ago</div>
+                <div class="time">{{convertDate(post.createdAt)}}</div>
               </div>
             </div>
             <div class="float-left post-h2">
@@ -89,7 +100,13 @@
               </div>
             </div>
             <div class="d-flex flex-row w-100 pt-2 pl-3 pr-3">
-              <Like class="w-50 text-sec" :likes="post.likes" :userId="user._id" :postId="post._id"></Like>
+              <Like
+                class="w-50 text-sec"
+                :checkLiked="checkLiked(post._id,post.likes, user._id)"
+                :likes="post.likes"
+                :userId="user._id"
+                :postId="post._id"
+              ></Like>
               <div class="w-50 text-sec" @click.prevent="toggle(post._id)">
                 <b></b>
                 <i class="fas fa-comment"></i> Comment
@@ -113,6 +130,7 @@ import apiService from "../../services/apiServices";
 import Comment from "../shared/comment";
 import Like from "../shared/Like";
 import { mapState } from "vuex";
+import moment from "moment";
 
 export default {
   data() {
@@ -130,11 +148,22 @@ export default {
   mounted() {
     this.getFollowedPost();
   },
+  created() {
+    EventBus.$on("updateRender", value => {
+      this.getAuthPost();
+    });
+  },
   components: {
     Comment,
     Like
   },
   methods: {
+    checkLiked: (postId, likes, userId) => {
+      let hasLiked = likes.find(like => {
+        return like.author === userId && like.post._id === postId;
+      });
+      return hasLiked;
+    },
     toggleLike: function() {
       this.active ? this.createLike() : this.deleteLike();
     },
@@ -152,6 +181,9 @@ export default {
       });
       this.post = "";
       this.getFollowedPost();
+    },
+    convertDate: function(date) {
+      return moment(date).fromNow();
     },
     createComment: async function(payload) {
       const response = await apiService.CREATE_COMMENT({
@@ -259,5 +291,12 @@ export default {
 
 .image-upload span {
   cursor: pointer;
+}
+.style-img {
+  background-position: center;
+  background-size: cover;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
 }
 </style>

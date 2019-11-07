@@ -5,12 +5,12 @@ const userModel = require('../models/user')
 exports.createLike = async (req, res) => {
     new Like({
         post: req.body.postId,
-        author: req.user._id,
+        author: req.user.id,
     }).save(async (err, like) => {
         // if there is a err
         if (err) return res.status(502).send(err);
 
-        // pust like to user collection
+        // push like to user collection
         let user = await userModel.User.findByIdAndUpdate(
             { _id: like.author },
             { $push: { likes: like._id } }

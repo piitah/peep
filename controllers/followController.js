@@ -3,7 +3,7 @@ const userModel = require('../models/user')
 
 exports.createFollow = async (req, res) => {
     new Follow({
-        follower: req.user._id,
+        follower: req.user.id,
         user: req.body.userId
     }).save(async (err, follow) => {
         //  err

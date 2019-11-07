@@ -20,7 +20,7 @@ let upload = multer({
 
 // Queries
 exports.getAuthPost = async (req, res) => {
-    await Post.find({ author: req.user._id })
+    await Post.find({ author: req.user.id })
         .populate('author')
         .populate({
             path: "likes",
@@ -102,20 +102,18 @@ exports.getPostById = async (req, res) => {
 
 exports.getfollowedpost = async (req, res) => {
     const userFollowing = []
-    const follow = await Follow.find({ follower: req.user._id }, { _id: 0 }).select('user')
+    const follow = await Follow.find({ follower: req.user.id }, { _id: 0 }).select('user')
     follow.map(f => userFollowing.push(f.user))
-
     const query = {
-        $or: [{ author: { $in: userFollowing } }, { author: req.user._id }]
+        $or: [{ author: { $in: userFollowing } }, { author: req.user.id }]
     }
 
     await Post.find(query)
         .populate('author')
         .populate({
             path: "likes",
-            populate: { path: "posts" }
+            populate: { path: "post" }
         })
-        .populate("posts")
         .populate({
             path: 'comments',
             options: { sort: { createdAt: 'desc' } },
@@ -145,7 +143,7 @@ exports.createPost = async (req, res) => {
         new Post({
             title: req.body.title,
             image: req.body.image,
-            author: req.user._id
+            author: req.user.id
         }).save(async (err, post) => {
             // err
             if (err) return res.status(502).send({

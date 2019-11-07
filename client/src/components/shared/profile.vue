@@ -162,7 +162,18 @@
     <section>
       <div class="post-wrapper mb-5" v-for="post in authPost" :key="post._id">
         <div class="d-flex flex-row w-100 align-items-center post-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" class="mr-3" viewBox="0 0 53 53">
+          <div
+            v-if="post.author.image"
+            class="style-img mr-3"
+            :style="{ backgroundImage: 'url(' + post.author.image + ')'}"
+          >&nbsp;</div>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            class="mr-3"
+            viewBox="0 0 53 53"
+          >
             <path
               d="M18.613 41.552l-7.907 4.313a7.106 7.106 0 0 0-1.269.903A26.377 26.377 0 0 0 26.5 53c6.454 0 12.367-2.31 16.964-6.144a7.015 7.015 0 0 0-1.394-.934l-8.467-4.233a3.229 3.229 0 0 1-1.785-2.888v-3.322c.238-.271.51-.619.801-1.03a19.482 19.482 0 0 0 2.632-5.304c1.086-.335 1.886-1.338 1.886-2.53v-3.546c0-.78-.347-1.477-.886-1.965v-5.126s1.053-7.977-9.75-7.977-9.75 7.977-9.75 7.977v5.126a2.644 2.644 0 0 0-.886 1.965v3.546c0 .934.491 1.756 1.226 2.231.886 3.857 3.206 6.633 3.206 6.633v3.24a3.232 3.232 0 0 1-1.684 2.833z"
               fill="#e7eced"
@@ -175,7 +186,7 @@
           <div class="post-h1">
             <div class="d-flex flex-column" style="line-height: 18px;">
               <div class="user-name">{{post.author.firstname}} {{ post.author.lastname}}</div>
-              <div class="time">10 days ago</div>
+              <div class="time">{{convertDate(post.createdAt)}}</div>
             </div>
           </div>
           <div class="float-left post-h2">
@@ -185,7 +196,7 @@
         <div class="mb-3 post-title text-left ml-4 mr-3">{{post.title}}</div>
         <div class="post-img">
           <div>
-            <img :src="post.image" class="img-fluid" alt />
+            <img :src="post.image" id="img-data" class="img-fluid" alt />
           </div>
         </div>
         <div class="post-detais pl-4 pr-4 pt-3 pb-3">
@@ -202,7 +213,13 @@
             </div>
           </div>
           <div class="d-flex flex-row w-100 pt-2 pl-3 pr-3">
-            <Like class="w-50 text-sec" :likes="post.likes" :userId="user._id" :postId="post._id"></Like>
+            <Like
+              class="w-50 text-sec"
+              :checkLiked="checkLiked(post._id,post.likes, user._id)"
+              :likes="post.likes"
+              :userId="user._id"
+              :postId="post._id"
+            ></Like>
             <div
               class="w-50 text-sec"
               style="cursor:pointer !important;"
@@ -213,33 +230,12 @@
             </div>
           </div>
         </div>
-        <div class="border-top" :class="show  === post._id ? 'show' : 'hide'">
-          <div class="d-flex flex-row align-items-center pt-2 pl-1 pr-3">
-            <div class="comment-input pt-2">
-              <textarea placeholder="Add Comment" class="formControl" v-model="comment" />
-            </div>
-            <div
-              class="comment-post"
-              style="cursor:pointer !important;"
-              @click.prevent="createComment(post._id)"
-            >Post</div>
-          </div>
-        </div>
-        <div class="border-top" :class="show  === post._id ? 'show' : 'hide'">
-          <div
-            class="d-flex flex-row align-items-cer pt-2 pl-3 pb-2 pr-3"
-            v-for="comment in post.comments"
-            :key="comment._id"
-          >
-            <div class>
-              <div class="user-avatar mr-2"></div>
-            </div>
-            <div class="user-comment">
-              <span class="user-name">{{post.author.firstname}} {{ post.author.lastname}}</span>
-              {{comment.comment}}
-            </div>
-          </div>
-        </div>
+        <Comment
+          @commentData="createComment"
+          :postId="post._id"
+          :comments="post.comments"
+          :show="show"
+        />
       </div>
     </section>
   </div>
@@ -249,9 +245,11 @@
 import apiService from "../../services/apiServices.js";
 import userService from "../../services/userService.js";
 import Comment from "../shared/comment";
+import moment from "moment";
 import Like from "../shared/Like";
 import { mapState } from "vuex";
-
+import { EventBus } from "@/main";
+import Bound from "bounds.js";
 export default {
   name: "searchResult",
   data() {
@@ -262,11 +260,11 @@ export default {
       authPost: null,
       auth: "",
       image: "",
-      hasLiked: "",
       comment: "",
       post: "",
       loading1: false,
-      loading2: false
+      loading2: false,
+      status: false
     };
   },
   components: {
@@ -278,12 +276,43 @@ export default {
   },
   created() {
     this.auth = this.user._id;
+    this.getAuthUser();
+    EventBus.$on("updateRender", value => {
+      this.getAuthPost();
+    });
   },
   mounted() {
     this.getAuthUser();
     this.getAuthPost();
+    console.log("remounting");
   },
   methods: {
+    // lazyLoading: () => {
+    //   const boundary = Bound({
+    //     margins: { bottom: 100 }
+    //   });
+    //   const image = document.querySelectorAll("#img-data");
+    //   console.log(image);
+    //   const whenImageEnters = image => {
+    //     return () => {
+    //       image.src = image.dataset.src;
+    //       boundary.unWatch(image);
+    //       console.log("show");
+    //     };
+    //   };
+    //   image.forEach(img => {
+    //     boundary.watch(img, whenImageEnters(img));
+    //   });
+    // },
+    convertDate: function(date) {
+      return moment(date).fromNow();
+    },
+    checkLiked: (postId, likes, userId) => {
+      let hasLiked = likes.find(like => {
+        return like.author === userId && like.post._id === postId;
+      });
+      return hasLiked;
+    },
     toggle: function(id) {
       if (this.show === id) this.show = false;
       else this.show = id;
@@ -293,10 +322,12 @@ export default {
       this.authUser = response.data;
       this.loading1 = false;
       this.loading2 = false;
+      EventBus.$emit("updateImages", response.data);
     },
     getAuthPost: async function() {
       const response = await apiService.GET_AUTH_POST();
       this.authPost = response.data.payload;
+      // this.lazyLoading();
     },
     createPost: async function() {
       const response = await apiService.CREATE_POST({
@@ -306,9 +337,6 @@ export default {
       this.post = "";
       this.getAuthPost();
       this.getAuthUser();
-    },
-    onLikeUpdate: function() {
-      this.getAuthPost();
     },
     createComment: async function(payload) {
       const response = await apiService.CREATE_COMMENT({
@@ -331,6 +359,7 @@ export default {
         image: image
       });
       this.getAuthUser();
+      this.getAuthPost();
     },
     onSelectedFile(event) {
       let event_instance = event;
@@ -355,6 +384,18 @@ export default {
 
 
 <style lang="scss" scoped>
+.style-img {
+  background-position: center;
+  background-size: cover;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+}
+.style-img {
+  border-radius: 50%;
+  width: 1.7rem;
+  height: 1.7rem;
+}
 .cover-image {
   position: absolute;
   top: 8px;

@@ -7,7 +7,9 @@
           <div class="sidebar">
             <div class="user-container">
               <router-link to="/Dashboard/profile" class="user">
+                <img v-if="user.image" :src="user.image" class="img-fluid style-img" alt />
                 <svg
+                  v-else
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   class="mr-2"
@@ -22,7 +24,7 @@
                     fill="#757575"
                   />
                 </svg>
-                {{authUser.firstname}}
+                {{user.firstname}}
               </router-link>
             </div>
             <ul>
@@ -212,16 +214,23 @@
 import {mapMutations} from "vuex"
 import userService from "../services/userService"
 import * as types from "../Store/modules/types";
+import {EventBus} from "@/main"
 
 export default {
     name: " Dashbaord",
     data() {
         return {
-          authUser: null
+          authUser: null,
+          user: ""
         }
     },
     mounted() {
       this.getAuthUser()
+    },
+    created() {
+      EventBus.$on("updateImages", (value) => {
+        this.user = value
+      })
     },
     methods: {
       getAuthUser: async function() {
@@ -233,6 +242,13 @@ export default {
 </script>
 
 <<style lang="scss" scoped>
+.style-img {
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+  width: 1.3rem;
+  height: 1.3rem;
+}
 .home-section{
     min-height: 76.5vh;
 }

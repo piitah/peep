@@ -80,7 +80,10 @@ exports.loginIn = async (req, res) => {
                             error: "Incorrect password"
                         })
                     }
-                    const token = helper.generateToken(user.toJSON())
+                    let userId = {
+                        id: user._id
+                    }
+                    const token = helper.generateToken(userId)
 
                     return res.status(200).send({
                         token: token,
@@ -102,12 +105,11 @@ exports.updateCoverImage = async (req, res) => {
         }
 
         let profileUpdate = {
-
         }
         if (req.body.image) { profileUpdate.coverImage = req.body.image }
 
         UserModel.User.findOneAndUpdate(
-            { _id: req.user._id },
+            { _id: req.user.id },
             { $set: profileUpdate },
             { new: true }
         ).then(user => {
@@ -133,7 +135,7 @@ exports.updateProfileImage = async (req, res) => {
         if (req.body.image) { profileUpdate.image = req.body.image }
 
         UserModel.User.findOneAndUpdate(
-            { _id: req.user._id },
+            { _id: req.user.id },
             { $set: profileUpdate },
             { new: true }
         ).then(user => {
@@ -148,7 +150,7 @@ exports.updateProfileImage = async (req, res) => {
     })
 }
 exports.getAuthUser = async (req, res) => {
-    await UserModel.User.findById({ _id: req.user._id })
+    await UserModel.User.findById({ _id: req.user.id })
         .populate('likes')
         .populate('followers')
         .populate('following')
@@ -188,7 +190,7 @@ exports.searchController = async (req, res) => {
 }
 
 exports.getUserPost = async (req, res) => {
-    await Post.find({ author: req.user._id })
+    await Post.find({ author: req.user.id })
         .populate('author')
         .populate('likes')
         .populate({
@@ -208,7 +210,7 @@ exports.getUserPost = async (req, res) => {
 
 exports.suggestion = async (req, res) => {
     const userFollowing = []
-    const follow = await Follow.find({ follower: req.user._id }, { _id: 0 }).select('user')
+    const follow = await Follow.find({ follower: req.user.id }, { _id: 0 }).select('user')
     follow.map(f => userFollowing.push(f.user))
 
     const query = { _id: { $nin: userFollowing } };
@@ -230,8 +232,8 @@ exports.suggestion = async (req, res) => {
 
 }
 exports.getAllUser = async (req, res) => {
-    const count = await UserModel.User.find({ _id: { $ne: req.user._id } }).countDocuments()
-    await UserModel.User.find({ _id: { $ne: req.user._id } })
+    const count = await UserModel.User.find({ _id: { $ne: req.user.id } }).countDocuments()
+    await UserModel.User.find({ _id: { $ne: req.user.id } })
         .populate('following')
         .populate('followers')
         .sort({ createdAt: 'desc' })

@@ -31,7 +31,7 @@
           <h2>{{authUser.firstname}} {{authUser.lastname}}</h2>
         </div>
         <div class="ml-3" v-if="auth !== authUser._id">
-          <Follow :following="authUser" :user="user"></Follow>
+          <Follow :following="authUser" :isFollowing="isFollowing(authUser)"></Follow>
         </div>
       </div>
 
@@ -215,18 +215,31 @@ export default {
   },
   created() {
     this.auth = this.user._id;
-    EventBus.$on("search_payload", payload => {
-      (this.authUser = payload.authUser), (this.authPost = payload.authPost);
+    EventBus.$on("updateUser", () => {
+      console.log("listening to event");
+      let instance = this;
+      setTimeout(() => {
+        instance.getUser();
+        instance.isFollowing(instance.authUser);
+      }, 2000);
     });
   },
   mounted() {
     this.getUser();
     this.getPost();
+    console.log("remounting");
   },
   methods: {
     toggle: function(id) {
       if (this.show === id) this.show = false;
       else this.show = id;
+    },
+    isFollowing(following) {
+      console.log(following);
+      let isFollowing = this.user.following.find(user => {
+        return user.user === following._id;
+      });
+      return isFollowing;
     },
     createFollow: async function(id) {
       const response = await apiService.CREATE_Follow({

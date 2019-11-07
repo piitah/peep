@@ -4,7 +4,7 @@ const userModel = require('../models/user')
 
 exports.createComment = async (req, res) => {
     new Comment({
-        author: req.user._id,
+        author: req.user.id,
         comment: req.body.comment,
         post: req.body.postId
     }).save(async (err, comment) => {
@@ -50,7 +50,7 @@ exports.deleteComment = async (req, res) => {
     }
     // delete comment from user collection
     const user = await userModel.User.findOneAndUpdate(
-        { _id: req.user._id },
+        { _id: req.user },
         { $pull: { comments: comment._id } }
     )
     if (!user) {

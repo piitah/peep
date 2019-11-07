@@ -15,7 +15,6 @@ import 'bootstrap-vue/esm/directives/modal/modal'
 import "../src/assets/styles/css/v.css"
 import "../src/assets/animate.css"
 
-
 export const EventBus = new Vue();
 
 export const authService = () => {

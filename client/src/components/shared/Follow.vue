@@ -4,30 +4,25 @@
       class="bt"
       :class="isFollowing ? 'btn-grey': 'btn-pri'"
       @click.prevent="followHandler()"
-    >{{isFollowing ? "following" : "follow"}}</button>
+    >{{isFollowing ? "Unfollow" : "follow"}}</button>
   </div>
 </template>
 
 <script>
 import apiServices from "../../services/apiServices";
+import { EventBus } from "@/main";
 
 export default {
-  props: ["user", "following"],
+  props: ["isFollowing", "following"],
   data() {
-    return {
-      isFollowing: ""
-    };
-  },
-  mounted() {
-    this.isFollowing = this.user.following.find(user => {
-      return user.user === this.following._id;
-    });
+    return {};
   },
   methods: {
     followHandler() {
       this.isFollowing
         ? this.deleteFollow(this.isFollowing._id)
         : this.createFollow(this.following._id);
+      EventBus.$emit("updateUser");
     },
     createFollow: async userId => {
       const response = await apiServices.CREATE_FOLLOW({
