@@ -211,33 +211,19 @@
 </template>
 
 <<script>
-import {mapMutations} from "vuex"
-import userService from "../services/userService"
-import * as types from "../Store/modules/types";
 import {EventBus} from "@/main"
-
 export default {
     name: " Dashbaord",
     data() {
         return {
-          authUser: null,
-          user: ""
+          user: null
         }
     },
-    mounted() {
-      this.getAuthUser()
-    },
-    created() {
-      EventBus.$on("updateImages", (value) => {
-        this.user = value
-      })
-    },
-    methods: {
-      getAuthUser: async function() {
-      const response = await userService.GET_AUTH_USER();
-      this.authUser = response.data;
-    },
-    },
+     created() {
+    EventBus.$on("updateImages", value => {
+      this.user = value;
+    });
+  }
 }
 </script>
 

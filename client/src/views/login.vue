@@ -1,54 +1,58 @@
 <template>
   <div class="login">
-    <div class>
+    <div class="login-secondary">
       &nbsp;
-      <form class="login-container" @submit.prevent="onSubmitHandler">
-        <div class="w-100">
-          <div class="login-header-primary">
-            <h3>Login</h3>
+      <div class="d-flex justify-content-center align-items-center h-100">
+        <form class="login-container" @submit.prevent="onSubmitHandler">
+          <div class="w-100">
+            <div class="w-100">
+              <div class="login-header-primary">
+                <h3>Login</h3>
+              </div>
+              <div class="login-header-primary mb-3">Sign in to your account</div>
+              <div class="login-header-primary mb-3 error">{{msg}}</div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                v-model="user.email"
+                id="email"
+                name="email"
+                class="form-control"
+                :class="{ 'is-invalid': submitted && $v.user.email.$error }"
+              />
+              <div v-if="submitted && $v.user.email.$error" class="invalid-feedback">
+                <span v-if="!$v.user.email.required">Email is required</span>
+                <span v-if="!$v.user.email.email">Email is invalid</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                v-model="user.password"
+                id="password"
+                name="password"
+                class="form-control"
+                :class="{ 'is-invalid': submitted && $v.user.password.$error }"
+              />
+              <div v-if="submitted && $v.user.password.$error" class="invalid-feedback">
+                <span v-if="!$v.user.password.required">Password is required</span>
+                <span v-if="!$v.user.password.minLength">Password must be at least 6 characters</span>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-color w-100" :disabled="disabled">
+                <span v-if="loading">
+                  <div class="m-loader"></div>
+                </span>
+                <span v-else>{{submitText}}</span>
+              </button>
+            </div>
           </div>
-          <div class="login-header-primary mb-3">Sign in to your account</div>
-          <div class="login-header-primary mb-3 error">{{msg}}</div>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            v-model="user.email"
-            id="email"
-            name="email"
-            class="form-control"
-            :class="{ 'is-invalid': submitted && $v.user.email.$error }"
-          />
-          <div v-if="submitted && $v.user.email.$error" class="invalid-feedback">
-            <span v-if="!$v.user.email.required">Email is required</span>
-            <span v-if="!$v.user.email.email">Email is invalid</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            v-model="user.password"
-            id="password"
-            name="password"
-            class="form-control"
-            :class="{ 'is-invalid': submitted && $v.user.password.$error }"
-          />
-          <div v-if="submitted && $v.user.password.$error" class="invalid-feedback">
-            <span v-if="!$v.user.password.required">Password is required</span>
-            <span v-if="!$v.user.password.minLength">Password must be at least 6 characters</span>
-          </div>
-        </div>
-        <div class="text-center">
-          <button type="submit" class="btn btn-color w-100" :disabled="disabled">
-            <span v-if="loading">
-              <div class="m-loader"></div>
-            </span>
-            <span v-else>{{submitText}}</span>
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -132,14 +136,17 @@ export default {
   margin: auto;
 }
 .login-container {
-  margin-top: 4.4rem !important;
   margin: auto;
   border: 1px solid #ccc;
-  // padding: 1rem 0 2rem 0;
   background-color: #fff;
   width: 85%;
+  display: block;
+
   text-align: start !important;
   padding: 2rem;
+}
+.login-secondary {
+  height: 94vh;
 }
 .btn-color {
   background-color: rgb(51, 111, 148) !important;

@@ -216,7 +216,6 @@ export default {
       this.authUser = value;
     });
   },
-  mounted() {},
   methods: {
     logout: function() {
       this.$store.dispatch(`userModule/${types.USER_LOGOUT}`);

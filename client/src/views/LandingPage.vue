@@ -2,25 +2,29 @@
   <div class="section">
     <div class="top-wrap">
       &nbsp;
-      <div class="container">
-        <div class="top-content-wrap w-100 m-auto">
-          <div class="top-header-primary">
-            <h1>Developer Connector</h1>
-            <h5>
-              Create a developer profile/portfolio, share posts and get
-              help from other developers
-            </h5>
-          </div>
-          <div class="top-header-sec">
-            <p></p>
-          </div>
-          <div class="d-flex flex-row justify-content-center">
-            <a class="top-header-btn mr-3">
-              <span class="header-link">Sign Up</span>
-            </a>
-            <a class="top-header-btn">
-              <span class="header-link">Login</span>
-            </a>
+      <div class="container" style="height: 94vh;">
+        <div
+          class="top-content-wrap d-flex justify-content-center align-items-center h-100 w-100 m-auto"
+        >
+          <div>
+            <div class="top-header-primary">
+              <h1>Developer Connector</h1>
+              <h5>
+                Create a developer profile/portfolio, share posts and get
+                help from other developers
+              </h5>
+            </div>
+            <div class="top-header-sec">
+              <p></p>
+            </div>
+            <div class="d-flex flex-row justify-content-center">
+              <a class="top-header-btn mr-3">
+                <span class="header-link">Sign Up</span>
+              </a>
+              <a class="top-header-btn">
+                <span class="header-link">Login</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -54,10 +58,9 @@ export default {
     padding: 2rem;
     width: 100%;
     .top-header-primary {
-      width: 60%;
+      // width: 60%;
       text-align: center;
       margin: auto;
-      margin-top: 7.5rem;
       font-size: 22px;
       font-weight: bold;
       font-weight: 500;

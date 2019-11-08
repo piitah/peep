@@ -29,7 +29,6 @@ export default {
   created() {
     this.tryAutoLogin();
     this.getAuthUser();
-    this.getFollowedPost();
   },
   methods: {
     tryAutoLogin: function() {
@@ -39,10 +38,6 @@ export default {
       const response = await userService.GET_AUTH_USER();
       localStorage.setItem("authUser", JSON.stringify(response.data));
       EventBus.$emit("updateImages", response.data);
-    },
-    getFollowedPost: async function() {
-      const response = await apiService.GET_FOLLOWED_POST();
-      localStorage.setItem("posts", JSON.stringify(response.data.payload));
     }
   }
 };

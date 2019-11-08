@@ -103,8 +103,6 @@
               <Like
                 class="w-50 text-sec"
                 :checkLiked="checkLiked(post._id,post.likes, user._id)"
-                :likes="post.likes"
-                :userId="user._id"
                 :postId="post._id"
               ></Like>
               <div class="w-50 text-sec" @click.prevent="toggle(post._id)">
@@ -131,6 +129,7 @@ import Comment from "../shared/comment";
 import Like from "../shared/Like";
 import { mapState } from "vuex";
 import moment from "moment";
+import { EventBus } from "@/main";
 
 export default {
   data() {
@@ -147,10 +146,11 @@ export default {
   },
   mounted() {
     this.getFollowedPost();
+    // this.posts = JSON.parse(localStorage.getItem("posts"));
   },
   created() {
-    EventBus.$on("updateRender", value => {
-      this.getAuthPost();
+    EventBus.$on("updateRender", event => {
+      this.getFollowedPost();
     });
   },
   components: {
@@ -163,12 +163,6 @@ export default {
         return like.author === userId && like.post._id === postId;
       });
       return hasLiked;
-    },
-    toggleLike: function() {
-      this.active ? this.createLike() : this.deleteLike();
-    },
-    isLiked: async function(postId) {
-      const response = await apiService.isLiked();
     },
     toggle: function(id) {
       if (this.show === id) this.show = false;
@@ -194,17 +188,8 @@ export default {
     },
     getFollowedPost: async function() {
       const response = await apiService.GET_FOLLOWED_POST();
+      // localStorage.setItem("posts", JSON.stringify(response.data.payload));
       this.posts = response.data.payload;
-    },
-    createLike: async function(postId) {
-      const response = await apiService.CREATE_LIKE({
-        postId: postId
-      });
-      this.getFollowedPost();
-      return false;
-    },
-    deleteLike: async function() {
-      return true;
     },
     onSelectedFile(event) {
       let image = event.target.files[0];

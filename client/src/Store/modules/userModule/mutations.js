@@ -15,6 +15,9 @@ export const mutations = {
 
     [types.USER_LOGOUT_SUCCESS]: (state) => {
         window.localStorage.removeItem("user_token")
+        window.localStorage.removeItem("posts")
+        window.localStorage.removeItem("authPosts")
+        window.localStorage.removeItem("authUser")
         state.isAuthenticated = false;
         state.user = null;
         state.token = null

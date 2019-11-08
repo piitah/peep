@@ -216,8 +216,6 @@
             <Like
               class="w-50 text-sec"
               :checkLiked="checkLiked(post._id,post.likes, user._id)"
-              :likes="post.likes"
-              :userId="user._id"
               :postId="post._id"
             ></Like>
             <div
@@ -276,34 +274,18 @@ export default {
   },
   created() {
     this.auth = this.user._id;
-    this.getAuthUser();
-    EventBus.$on("updateRender", value => {
+    // this.getAuthUser();
+    EventBus.$on("updateRender", event => {
       this.getAuthPost();
     });
   },
   mounted() {
+    // this.authPost = JSON.parse(localStorage.getItem("authPosts"));
+    // this.authUser = JSON.parse(localStorage.getItem("authUser"));
     this.getAuthUser();
     this.getAuthPost();
-    console.log("remounting");
   },
   methods: {
-    // lazyLoading: () => {
-    //   const boundary = Bound({
-    //     margins: { bottom: 100 }
-    //   });
-    //   const image = document.querySelectorAll("#img-data");
-    //   console.log(image);
-    //   const whenImageEnters = image => {
-    //     return () => {
-    //       image.src = image.dataset.src;
-    //       boundary.unWatch(image);
-    //       console.log("show");
-    //     };
-    //   };
-    //   image.forEach(img => {
-    //     boundary.watch(img, whenImageEnters(img));
-    //   });
-    // },
     convertDate: function(date) {
       return moment(date).fromNow();
     },
@@ -319,6 +301,7 @@ export default {
     },
     getAuthUser: async function() {
       const response = await userService.GET_AUTH_USER();
+      // localStorage.setItem("authUser", JSON.stringify(response.data));
       this.authUser = response.data;
       this.loading1 = false;
       this.loading2 = false;
@@ -326,8 +309,8 @@ export default {
     },
     getAuthPost: async function() {
       const response = await apiService.GET_AUTH_POST();
+      // localStorage.setItem("authPosts", JSON.stringify(response.data.payload));
       this.authPost = response.data.payload;
-      // this.lazyLoading();
     },
     createPost: async function() {
       const response = await apiService.CREATE_POST({
@@ -340,10 +323,9 @@ export default {
     },
     createComment: async function(payload) {
       const response = await apiService.CREATE_COMMENT({
-        postId: payload,
-        comment: this.comment
+        postId: payload.postId,
+        comment: payload.comment
       });
-      this.comment = "";
       this.getAuthPost();
     },
     updateCoverImage: async function(image) {
@@ -395,6 +377,10 @@ export default {
   border-radius: 50%;
   width: 1.7rem;
   height: 1.7rem;
+}
+.comment {
+  width: 50%;
+  text-align: end !important;
 }
 .cover-image {
   position: absolute;
@@ -578,54 +564,6 @@ export default {
 .like {
   width: 50%;
   text-align: start;
-}
-.comment {
-  width: 50%;
-  text-align: end !important;
-}
-.formControl {
-  border: none;
-  width: 90%;
-  //   background-color: orange;
-  //   padding: 0.8rem;
-  outline: none;
-  box-sizing: content-box;
-  overflow-wrap: break-word;
-  //   line-height: 16px;
-  font-size: 15px;
-  color: rgba(0, 0, 0, 0.87);
-}
-.formControl:focus {
-  outline: none;
-  border: none;
-}
-.comment-input {
-  width: 90%;
-  overflow-wrap: break-word;
-}
-.comment-post {
-  width: 10%;
-  font-size: 15px;
-  font-weight: 600;
-  color: rgba(10, 60, 129, 0.721);
-}
-.user-avatar {
-  background-color: orangered;
-  width: 27px;
-  height: 27px;
-  border-radius: 50%;
-}
-.user-comment {
-  background-color: rgb(233, 233, 233);
-  font-size: 14px;
-  border-radius: 8px;
-  width: 100%;
-  overflow-wrap: break-word;
-  padding: 5px 10px 5px 4px;
-  text-align: start;
-  display: block;
-  overflow: hidden;
-  color: rgba(0, 0, 0, 0.87);
 }
 .user {
   display: block;
