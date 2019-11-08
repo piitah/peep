@@ -35,7 +35,7 @@ const suggestion = require("../routes/user/suggestion.js")
 const app = express()
 
 dotenv.config()
-
+app.use(express.static(path.join(__dirname, "../dist")))
 // use all middlewares
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
@@ -79,13 +79,12 @@ mongoose.connect(db, { useNewUrlParser: true })
     })
 
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../dist")))
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, "../dist", "index.html"))
-    })
-}
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, "../dist", "index.html"))
+})
+
 
 // port
 const port = process.env.PORT || 3030
