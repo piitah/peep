@@ -1,8 +1,15 @@
 <template>
   <div id="app">
     <section>
+      <Sidebar></Sidebar>
+    </section>
+    <section>
+      <Backdrop></Backdrop>
+    </section>
+    <section>
       <app-header></app-header>
     </section>
+
     <router-view />
   </div>
 </template>
@@ -16,6 +23,8 @@ import * as types from "../src/Store/modules/types";
 import { EventBus } from "@/main";
 import userService from "../src/services/userService";
 import apiService from "../src/services/apiServices";
+import Sidebar from "@/components/shared/sidebar";
+import Backdrop from "@/components/shared/Backdrop";
 
 export default {
   name: "app",
@@ -24,7 +33,9 @@ export default {
   },
   components: {
     appHeader,
-    appFooter
+    appFooter,
+    Sidebar,
+    Backdrop
   },
   created() {
     this.tryAutoLogin();
@@ -36,7 +47,11 @@ export default {
     },
     getAuthUser: async function() {
       const response = await userService.GET_AUTH_USER();
-      localStorage.setItem("authUser", JSON.stringify(response.data));
+      let data = response.data;
+      let authUser = {};
+      authUser.firstname = data.firstname;
+      authUser.image = data.image;
+      localStorage.setItem("authUser", JSON.stringify(authUser));
       EventBus.$emit("updateImages", response.data);
     }
   }
@@ -50,5 +65,15 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: rgb(236, 236, 236);
+}
+.sidebar-wrapper {
+  position: relative;
+}
+.sidebar {
+  background-color: #fff;
+  height: 100vh;
+  width: 200px;
+  position: fixed;
+  z-index: 999;
 }
 </style>

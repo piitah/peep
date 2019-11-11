@@ -1,7 +1,7 @@
 <template>
   <div class="home-section">
     &nbsp;
-    <div class="container mt-4">
+    <div class="container mt-3">
       <div class="row mt-3">
         <div class="col-md-2">
           <div class="sidebar">
@@ -212,18 +212,17 @@
 
 <<script>
 import {EventBus} from "@/main"
+
 export default {
     name: " Dashbaord",
     data() {
         return {
           user: null
-        }
+        } 
     },
-     created() {
-    EventBus.$on("updateImages", value => {
-      this.user = value;
-    });
-  }
+    mounted() {
+      this.user = JSON.parse(localStorage.getItem("authUser"));
+    },
 }
 </script>
 
@@ -333,12 +332,30 @@ export default {
   font-size: 13px;
   font-weight: 400; 
 }
-@media only screen and (max-width: 600px) {
-  .sidebar{
+ 
+    @media only screen 
+    and (min-width : 320px) 
+    and (max-width : 964px) {
+
+.sidebar{
     display: none;
   }
   .suggestion-section{
     display: none;
   }
+
+    }
+    @media only screen 
+and (min-width : 1224px) {
+
+    /* Styles */
+
+}
+
+@media only screen 
+and (min-width : 1824px) {
+
+    /* Styles */
+
 }
 </style>

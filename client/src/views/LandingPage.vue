@@ -18,12 +18,13 @@
               <p></p>
             </div>
             <div class="d-flex flex-row justify-content-center">
-              <a class="top-header-btn mr-3">
+              <router-link to="/signUp" class="top-header-btn mr-3" tag="li">
                 <span class="header-link">Sign Up</span>
-              </a>
-              <a class="top-header-btn">
-                <span class="header-link">Login</span>
-              </a>
+              </router-link>
+
+              <router-link to="/login" class="top-header-btn" tag="li">
+                <span class="header-link">Sign Up</span>
+              </router-link>
             </div>
           </div>
         </div>

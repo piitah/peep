@@ -51,7 +51,7 @@
       </div>-->
 
       <section>
-        <div class="post-wrapper mb-5" v-for="post in posts" :key="post._id">
+        <div class="post-wrapper mb-3" v-for="post in posts" :key="post._id">
           <div class="d-flex flex-row w-100 align-items-center post-header">
             <div
               v-if="post.author.image"
