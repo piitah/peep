@@ -69,7 +69,7 @@ app.use("/getPost", getPost)
 app.use("/getUser", getUser)
 app.use("/suggestion", suggestion)
 
-
+app.disable("etag")
 // connecting to mongodb cluster
 const db = require('../config/keys').mongoURI
 mongoose.connect(db, { useNewUrlParser: true })
