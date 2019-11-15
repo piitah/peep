@@ -8,10 +8,14 @@ export const actions = {
             .then(response => {
                 localStorage.setItem("user_token", response.data.token)
                 const decode = JSON.parse(atob(response.data.token.split('.')[1]))
-                context.commit(types.USER_LOGIN_SUCCESS, decode)
+                context.commit(types.USER_LOGIN_SUCCESS, {
+                    decode: decode,
+                    token: response.data.token
+                })
                 router.push({ path: '/Dashboard' })
             })
             .catch(error => {
+                console.log(error.response.data.error)
                 context.commit(types.USER_LOGIN_FAILED, error.response.data.error)
             })
     },
@@ -28,7 +32,7 @@ export const actions = {
     async [types.TRY_AUTO_LOGIN](context) {
         const token = window.localStorage.getItem("user_token")
         if (!token) {
-            return router.push({ path: "/login" })
+            return router.push({ path: "/" })
         }
 
         if (token) {
@@ -39,11 +43,11 @@ export const actions = {
                 token: token,
                 user: response.data
             })
+            // router.push({ path: '/Dashboard' })
         }
-        // router.push({ path: '/Dashboard' })
     },
     [types.USER_LOGOUT](context) {
         context.commit(types.USER_LOGOUT_SUCCESS)
-        router.push({ path: '/login' })
+        router.push({ path: '/' })
     }
 }

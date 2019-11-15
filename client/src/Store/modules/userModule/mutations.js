@@ -1,13 +1,13 @@
 import * as types from '../types'
+import { stringify } from 'querystring';
 
 export const mutations = {
     [types.USER_LOGIN_SUCCESS]: (state, payload) => {
-        if (window.localStorage.getItem("user_token")) {
-            state.token = window.localStorage.getItem("user_token")
+        if (localStorage.getItem("user_token")) {
+            state.token = payload.token
             state.isAuthenticated = true;
-            state.user = payload;
+            state.authUser = payload.decode;
         }
-
         state.msg = ''
         state.loading = false;
         state.disabled = false
@@ -15,11 +15,9 @@ export const mutations = {
 
     [types.USER_LOGOUT_SUCCESS]: (state) => {
         window.localStorage.removeItem("user_token")
-        window.localStorage.removeItem("posts")
-        window.localStorage.removeItem("authPosts")
         window.localStorage.removeItem("authUser")
         state.isAuthenticated = false;
-        state.user = null;
+        state.authUser = null;
         state.token = null
 
     },
@@ -41,12 +39,21 @@ export const mutations = {
         state.loading = true;
         state.disabled = true;
     },
+    [types.UPDATE_PROFILE_IMAGE]: (state, payload) => {
+        state.authUser.image = payload
+    },
+    [types.SEARCH_ID]: (state, payload) => {
+        localStorage.setItem("id", JSON.stringify({
+            id: payload
+        }))
+        state.search_id = payload
+    },
     [types.CANCEL_ALL_MESSAGES]: (state) => {
         state.msg = ""
     },
     [types.TRY_AUTO_LOGIN_SUCCESS]: (state, payload) => {
         state.token = payload.token
         state.isAuthenticated = true;
-        state.user = payload.user;
+        state.authUser = payload.user;
     },
 }

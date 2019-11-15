@@ -4,7 +4,7 @@
       <div class="profile-bg"></div>
       <div
         class="profile-overlay"
-        v-bind:style="{ backgroundImage: 'url(' + authUser.coverImage + ')' }"
+        v-bind:style="{ backgroundImage: 'url(' + User.coverImage + ')' }"
       >&nbsp;</div>
       <div class="cover-image">
         <div class="image-upload">
@@ -41,11 +41,8 @@
             <div class="m-loader"></div>
           </div>
         </div>
-        <div class="profile-img-1" v-if="authUser.image">
-          <div
-            class="profile-img-1"
-            v-bind:style="{ backgroundImage: 'url(' + authUser.image + ')' }"
-          ></div>
+        <div class="profile-img-1" v-if="User.image">
+          <div class="profile-img-1" v-bind:style="{ backgroundImage: 'url(' + User.image + ')' }"></div>
         </div>
 
         <div class="profile-img-1" v-else>
@@ -81,9 +78,9 @@
     <div class="profile-title mb-4">
       <div class="d-flex flex-row justify-content-center align-items-center mb-2">
         <div>
-          <h2>{{authUser.firstname}} {{authUser.lastname}}</h2>
+          <h2>{{User.firstname}} {{User.lastname}}</h2>
         </div>
-        <div class="ml-3" v-if="auth !== authUser._id">
+        <div class="ml-3" v-if="auth !== User._id">
           <button class="bt btn-pri">Follow</button>
         </div>
       </div>
@@ -94,56 +91,76 @@
       >
         <div class="text-sec">
           <span class="num">
-            <b>{{authUser.posts.length}}</b>
+            <b>{{User.posts.length}}</b>
           </span> posts
         </div>
         <div class="text-sec">
           <span class="num">
-            <b>{{authUser.followers.length}}</b>
+            <b>{{User.followers.length}}</b>
           </span> followers
         </div>
         <div class="text-sec">
           <span class="num">
-            <b>{{authUser.following.length}}</b>
+            <b>{{User.following.length}}</b>
           </span> following
         </div>
       </div>
     </div>
 
-    <section>
-      <div class="search-wrap container" v-if="auth === authUser._id">
-        <div class="d-flex flex-row w-100 justify-content-center align-items-center g-success">
-          <div class="mr-2">
-            <span style="font-size: 20px; " class="mr-2">
-              <i class="fas fa-user-circle icon"></i>
-            </span>
-          </div>
-          <div class="w-75">
-            <form @submit.prevent="createPost()">
-              <div class="input-group mb">
-                <div class="input-group-prepend">
-                  <span
-                    class="input-group-text"
-                    style="border: none !important; background-color: rgb(236, 236, 236);"
-                  >
-                    <i class="fas fa-search"></i>
-                  </span>
+    <section style="z-index : 300 !important;">
+      <div class="search-wrap container" v-if="auth === User._id">
+        <div :class="textarea ? 'border-bottom' : ''">
+          <div
+            class="d-flex flex-row w-100 justify-content-center align-items-top"
+            :class="textarea? 'mb-3': ''"
+          >
+            <div class="mr-2">
+              <span style="font-size: 20px; " class="mr-2">
+                <i class="fas fa-user-circle icon"></i>
+              </span>
+            </div>
+            <div :class="textarea ? 'w-100' : 'w-75'">
+              <form @submit.prevent="createPost()">
+                <div class="input-group mb">
+                  <textarea
+                    type="text"
+                    @focus="textarea = true"
+                    @blur="textarea = false"
+                    class="form-control"
+                    :class="!textarea? 'text-area' : 'text-area-focus'"
+                    placeholder="Add Post"
+                    v-model="post"
+                    style="background-color: rgb(236, 236, 236); border: none; outline: none;"
+                  />
                 </div>
+              </form>
+            </div>
+            <div class="ml-3" v-show="!textarea">
+              <div class="image-upload">
+                <label for="file-input" class="pt-">
+                  <span style="font-size: 20px; " class="mr-2">
+                    <i class="fas fa-camera icon"></i>
+                  </span>
+                </label>
                 <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Add Post"
-                  v-model="post"
-                  style="background-color: rgb(236, 236, 236); border: none; outline: none;"
+                  id="file-input"
+                  type="file"
+                  name="upLoadFile"
+                  @change="onSelectedFile($event)"
+                  ref="postImage"
+                  multiple
                 />
               </div>
-            </form>
+            </div>
           </div>
-          <div class="ml-3">
+        </div>
+
+        <div v-if="textarea" class="d-flex flex-row w-100 mt-3">
+          <div class="ml-2">
             <div class="image-upload">
               <label for="file-input" class="pt-2">
-                <span style="font-size: 20px; " class="mr-2">
-                  <i class="fas fa-camera icon"></i>
+                <span style="font-size: 15px; " class="mr-2 icon">
+                  <i class="fas fa-camera ico"></i> Photo
                 </span>
               </label>
               <input
@@ -156,11 +173,33 @@
               />
             </div>
           </div>
+          <div class="ml-auto">
+            <div class="d-flex flex-row">
+              <div class>
+                <button
+                  class="btn btn-custom"
+                  style="background-color: #ccc; "
+                  @click.prevent="textarea = false"
+                >Cancel</button>
+              </div>
+              <div class="ml-2">
+                <button
+                  @click.prevent="createPost()"
+                  class="btn btn-custom"
+                  style="background-color: blue;"
+                  :disabled="post.length === 0"
+                >Share</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <section>
-      <div class="post-wrapper mb-5" v-for="post in authPost" :key="post._id">
+    <Placeholder v-if="!authPost"></Placeholder>
+
+    <NoPost v-if="authUser.posts.length === 0"></NoPost>
+    <section v-else>
+      <div class="post-wrapper mb-3" v-for="post in authPost" :key="post._id">
         <div class="d-flex flex-row w-100 align-items-center post-header">
           <div
             v-if="post.author.image"
@@ -191,6 +230,19 @@
           </div>
           <div class="float-left post-h2">
             <b>...</b>
+            <div class="my-2">
+              <v-btn depressed small>Normal</v-btn>
+            </div>
+            <v-menu transition="slide-y-transition" bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn class="purple" color="primary" dark v-on="on">Slide Y Transition</v-btn>
+              </template>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-title>hek</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </div>
         </div>
         <div class="mb-3 post-title text-left ml-4 mr-3">{{post.title}}</div>
@@ -215,7 +267,7 @@
           <div class="d-flex flex-row w-100 pt-2 pl-3 pr-3">
             <Like
               class="w-50 text-sec"
-              :checkLiked="checkLiked(post._id,post.likes, user._id)"
+              :checkLiked="checkLiked(post._id,post.likes, authUser._id)"
               :postId="post._id"
             ></Like>
             <div
@@ -240,8 +292,11 @@
 </template>
 
 <script>
+import * as types from "../../Store/modules/types";
 import apiService from "../../services/apiServices.js";
 import userService from "../../services/userService.js";
+import NoPost from "../shared/NoPost";
+import Placeholder from "../shared/Placeholder";
 import Comment from "../shared/comment";
 import moment from "moment";
 import Like from "../shared/Like";
@@ -254,38 +309,48 @@ export default {
     return {
       hideLike: true,
       show: "",
-      authUser: null,
+      User: null,
       authPost: null,
       auth: "",
       image: "",
       comment: "",
+      textarea: false,
       post: "",
       loading1: false,
       loading2: false,
-      status: false
+      status: false,
+      finish_loading: false
     };
   },
   components: {
     Comment,
-    Like
+    Like,
+    NoPost,
+    Placeholder
   },
   computed: {
-    ...mapState("userModule", ["isAuthenticated", "user"])
+    ...mapState("userModule", ["isAuthenticated", "authUser"])
   },
   created() {
-    this.auth = this.user._id;
-    // this.getAuthUser();
+    this.auth = this.authUser._id;
+    this.getAuthUser();
     EventBus.$on("updateRender", event => {
       this.getAuthPost();
     });
   },
   mounted() {
-    // this.authPost = JSON.parse(localStorage.getItem("authPosts"));
-    // this.authUser = JSON.parse(localStorage.getItem("authUser"));
     this.getAuthUser();
     this.getAuthPost();
   },
   methods: {
+    textareaFocus: function() {
+      this.textarea = true;
+      EventBus.$emit("textarea", true);
+    },
+    closeTextArea: () => {
+      this.textarea = false;
+      EventBus.$emit("close", false);
+    },
     convertDate: function(date) {
       return moment(date).fromNow();
     },
@@ -302,7 +367,8 @@ export default {
     getAuthUser: async function() {
       const response = await userService.GET_AUTH_USER();
       // localStorage.setItem("authUser", JSON.stringify(response.data));
-      this.authUser = response.data;
+      this.User = response.data;
+      this.finish_loading = true;
       this.loading1 = false;
       this.loading2 = false;
       EventBus.$emit("updateImages", response.data);
@@ -340,6 +406,9 @@ export default {
       const response = await userService.UPDATE_PROFILE_IMAGE({
         image: image
       });
+      if (response.data.status) {
+        this.$store.commit(`userModule/${types.UPDATE_PROFILE_IMAGE}`, image);
+      }
       this.getAuthUser();
       this.getAuthPost();
     },
@@ -366,6 +435,21 @@ export default {
 
 
 <style lang="scss" scoped>
+.btn-custom {
+  width: 4rem;
+  height: 2.5rem;
+  color: white;
+}
+.text-area {
+  height: 40px;
+  outline: none;
+  border: none;
+}
+.text-area-focus {
+  height: 80px;
+  outline: none;
+  border: none;
+}
 .style-img {
   background-position: center;
   background-size: cover;
@@ -577,7 +661,7 @@ export default {
   background-color: white;
   width: 90%;
   padding: 1rem;
-
+  z-index: 999 !important;
   margin-bottom: 1rem;
   box-shadow: 0 2px 3px #ccc;
   border-radius: 4px;
@@ -602,6 +686,16 @@ export default {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 480px) {
+  .post-wrapper {
+    width: 100%;
+  }
+  .search-wrap {
+    width: 100%;
+    z-index: 300;
   }
 }
 </style>

@@ -2,7 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./Store/store";
-import Vuetify from 'vuetify';
+import Vuetify from './plugins/vuetify';
 import bootstrapVue from 'bootstrap-vue';
 import Vuelidate from 'vuelidate'
 import 'vuetify/dist/vuetify.min.css'
@@ -17,17 +17,9 @@ import "../src/assets/animate.css"
 
 export const EventBus = new Vue();
 
-export const authService = () => {
-  const token = window.localStorage.getItem('user_token')
-  if (!token) {
-    return false;
-  }
-  return true
-}
-
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!window.localStorage.getItem('user_token')) {
+    if (!store.state.userModule.token) {
       next({
         path: "/login",
         query: { redirect: to.fullPath }
@@ -40,14 +32,13 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-
 Vue.config.productionTip = false;
 Vue.use(bootstrapVue)
-Vue.use(Vuetify)
 Vue.use(Vuelidate)
 
 new Vue({
   router,
   store,
+  // Vuetify,
   render: h => h(App)
 }).$mount("#app");

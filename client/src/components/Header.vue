@@ -2,11 +2,7 @@
   <div class="header-section">
     <nav class="navbar navbar-expand-lg primary-header">
       <div class="header-style d-flex flex-row w-100 align-items-center">
-        <span
-          style="font-size: 20px; cursor: pointer "
-          class="mr-3"
-          @click.prevent="toggleSidebar()"
-        >
+        <span v-if="isAuthenticated" class="mr-3 bar-icon" @click.prevent="toggleSidebar()">
           <i class="fas fa-bars"></i>
         </span>
         <router-link
@@ -29,18 +25,6 @@
         >
           <span>DevCircle</span>
         </router-link>
-        <!-- <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>-->
-
         <ul class="navbar-nav header-search">
           <li class="nav-item search-parent" v-if="isAuthenticated">
             <form @submit.prevent="createPost()">
@@ -123,10 +107,10 @@
               <h4>no new notification</h4>
             </div>
           </div>
-          <div class="nav-item ml-2 mr- menu-parent" v-if="isAuthenticated">
+          <div class="nav-item ml-2 menu-parent" v-if="isAuthenticated">
             <div
               v-if="authUser.image"
-              class="style-img mr-2"
+              class="style-img"
               :style="{ backgroundImage: 'url(' + authUser.image + ')'}"
             >&nbsp;</div>
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="28" viewBox="0 0 53 53">
@@ -191,7 +175,7 @@ export default {
       error: "",
       authpost: "",
       show: false,
-      authUser: "",
+      // authUser: "",
       user: ""
     };
   },
@@ -210,10 +194,7 @@ export default {
     }, 700)
   },
   computed: {
-    ...mapState("userModule", ["isAuthenticated"])
-  },
-  mounted() {
-    this.authUser = JSON.parse(localStorage.getItem("authUser"));
+    ...mapState("userModule", ["isAuthenticated", "authUser"])
   },
   methods: {
     toggleSidebar: function() {
@@ -232,9 +213,8 @@ export default {
       this.authPost = response.data.payload;
     },
     NavigateTo: async function(id, name) {
-      this.getUser(id);
-      this.getPost(id);
-      this.$router.push(`/dashboard/search/${id}`);
+      this.$router.push(`/dashboard/search/${name}`);
+      this.$store.commit(`userModule/${types.SEARCH_ID}`, id);
       this.search = "";
       this.error = "";
     }
@@ -271,7 +251,7 @@ export default {
   border-bottom: 1px solid #ccc;
   position: fixed;
   width: 100% !important;
-  z-index: 99;
+  z-index: 120;
   .navbar-brand {
     color: rgb(51, 111, 148);
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -384,7 +364,15 @@ export default {
 .search--hide {
   display: none;
 }
+.bar-icon {
+  font-size: 20px;
+  cursor: pointer;
+  display: none;
+}
 @media only screen and (min-width: 320px) and (max-width: 480px) {
+  .bar-icon {
+    display: block;
+  }
   .header-search {
     margin-left: 0rem;
   }
@@ -402,6 +390,9 @@ export default {
   }
 }
 @media only screen and (min-width: 481px) and (max-width: 964px) {
+  .bar-icon {
+    display: block;
+  }
   .header-search {
     margin-left: 0rem;
   }

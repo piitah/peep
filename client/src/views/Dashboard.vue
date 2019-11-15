@@ -4,10 +4,10 @@
     <div class="container mt-3">
       <div class="row mt-3">
         <div class="col-md-2">
-          <div class="sidebar">
+          <div class="sidebr">
             <div class="user-container">
               <router-link to="/Dashboard/profile" class="user">
-                <img v-if="user.image" :src="user.image" class="img-fluid style-img" alt />
+                <img v-if="authUser.image" :src="authUser.image" class="img-fluid style-img" alt />
                 <svg
                   v-else
                   xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
                     fill="#757575"
                   />
                 </svg>
-                {{user.firstname}}
+                {{authUser.firstname}}
               </router-link>
             </div>
             <ul>
@@ -212,16 +212,17 @@
 
 <<script>
 import {EventBus} from "@/main"
+import {mapState} from "vuex"
 
 export default {
     name: " Dashbaord",
     data() {
         return {
-          user: null
+          // user: null
         } 
     },
-    mounted() {
-      this.user = JSON.parse(localStorage.getItem("authUser"));
+    computed : {
+      ...mapState("userModule", ["authUser"])
     },
 }
 </script>
@@ -288,10 +289,10 @@ export default {
     font-size: 14px;
     text-decoration: none;
 }
-.sidebar ul{
+.sidebr ul{
     width: 100%;
 }
-.sidebar ul li {
+.sidebr ul li {
    
     width: 100%;
   padding: 10px;
@@ -299,21 +300,21 @@ export default {
   list-style: none;
 }
 
-.sidebar ul li a {
+.sidebr ul li a {
   color: black;
 //   display: block;
   font-size: 14px;
   text-decoration: none;
 }
 
-.sidebar ul li:hover {
+.sidebr ul li:hover {
   background-color: #7099ca;
 }
 
-.sidebar ul li:hover a {
+.sidebr ul li:hover a {
   color: #fff;
 }
-.sidebar{
+.sidebr{
     position: fixed;
     width: 10rem;
 }
@@ -337,7 +338,7 @@ export default {
     and (min-width : 320px) 
     and (max-width : 964px) {
 
-.sidebar{
+.sidebr{
     display: none;
   }
   .suggestion-section{

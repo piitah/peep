@@ -1,21 +1,22 @@
 import axios from 'axios'
-// import store from "../Store/store"
+import store from "../Store/store"
 
-let token;
-if (window.localStorage.getItem('user_token') !== null) {
-    token = window.localStorage.getItem('user_token')
-} else {
-    token = "no token found"
-}
+const Api = axios.create({
+    baseURL: ``,
+    headers: {
+        "Accept": "application/json",
+        "Content-type": "application/json"
+    }
+})
+Api.interceptors.request.use(
+    async (config) => {
+        const token = store.state.userModule.token; // slightly longer running function than example above
+        if (token) config.headers.Authorization = token;
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
-export default () => {
-    return axios.create({
-        baseURL: ``,
-        headers: {
-            "Authorization": token,
-            "Accept": "application/json",
-            "Content-type": "application/json"
-        }
-
-    })
-}
+export default Api;

@@ -1,47 +1,94 @@
 <template>
   <div>
     <div class="main-sectin">
-      <div class="search-wrap container">
-        <div class="d-flex flex-row w-100 justify-content-center align-items-center g-success">
-          <div class="mr-2">
-            <span style="font-size: 20px; " class="mr-2">
-              <i class="fas fa-user-circle icon"></i>
-            </span>
-          </div>
-          <div class="w-75">
-            <form @submit.prevent="createPost">
-              <div class="input-group mb">
-                <div class="input-group-prepend">
-                  <span
-                    class="input-group-text"
-                    style="border: none !important; background-color: rgb(245, 245, 245);"
-                    id="inputGroupPrepend2"
-                  >
-                    <i class="fas fa-search"></i>
-                  </span>
+      <section style="z-index : 300 !important;">
+        <div class="search-wrap container">
+          <div :class="textarea ? 'border-bottom' : ''">
+            <div
+              class="d-flex flex-row w-100 justify-content-center align-items-top"
+              :class="textarea? 'mb-3': ''"
+            >
+              <div class="mr-2">
+                <span style="font-size: 20px; " class="mr-2">
+                  <i class="fas fa-user-circle icon"></i>
+                </span>
+              </div>
+              <div :class="textarea ? 'w-100' : 'w-75'">
+                <form @submit.prevent="createPost()">
+                  <div class="input-group mb">
+                    <textarea
+                      type="text"
+                      @focus="textarea = true"
+                      @blur="textarea = false"
+                      class="form-control"
+                      :class="!textarea? 'text-area1' : 'text-area-focus1'"
+                      placeholder="Add Post"
+                      v-model="post"
+                      style="background-color: rgb(236, 236, 236); border: none; outline: none;"
+                    />
+                  </div>
+                </form>
+              </div>
+              <div class="ml-3" v-show="!textarea">
+                <div class="image-upload">
+                  <label for="file-input" class="pt-">
+                    <span style="font-size: 20px; " class="mr-2">
+                      <i class="fas fa-camera icon"></i>
+                    </span>
+                  </label>
+                  <input
+                    id="file-input"
+                    type="file"
+                    name="upLoadFile"
+                    @change="onSelectedFile($event)"
+                    ref="postImage"
+                    multiple
+                  />
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="textarea" class="d-flex flex-row w-100 mt-3">
+            <div class="ml-2">
+              <div class="image-upload">
+                <label for="file-input" class="pt-2">
+                  <span style="font-size: 15px; " class="mr-2 icon">
+                    <i class="fas fa-camera ico"></i> Photo
+                  </span>
+                </label>
                 <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Add Post"
-                  v-model="post"
-                  style="background-color: rgb(245, 245, 245); border: none; outline: none;"
+                  id="file-input"
+                  type="file"
+                  name="upLoadFile"
+                  @change="onSelectedFile($event)"
+                  ref="postImage"
+                  multiple
                 />
               </div>
-            </form>
-          </div>
-          <div class="ml-3">
-            <div class="image-upload">
-              <label for="file-input" class="pt-2">
-                <span style="font-size: 20px; " class="mr-2">
-                  <i class="fas fa-camera icon"></i>
-                </span>
-              </label>
-              <input id="file-input" type="file" name="upLoadFile" @change="onSelectedFile" />
+            </div>
+            <div class="ml-auto">
+              <div class="d-flex flex-row">
+                <div class>
+                  <button
+                    class="btn btn-custom"
+                    style="background-color: #ccc; "
+                    @click.prevent="textarea = false"
+                  >Cancel</button>
+                </div>
+                <div class="ml-2">
+                  <button
+                    @click.prevent="createPost()"
+                    class="btn btn-custom"
+                    style="background-color: blue;"
+                    :disabled="post.length === 0"
+                  >Share</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- <div class="search-wrap mt-4" style="text-align: start;">
         You have not yet setup a profile, please add some info.
@@ -102,7 +149,7 @@
             <div class="d-flex flex-row w-100 pt-2 pl-3 pr-3">
               <Like
                 class="w-50 text-sec"
-                :checkLiked="checkLiked(post._id,post.likes, user._id)"
+                :checkLiked="checkLiked(post._id,post.likes, authUser._id)"
                 :postId="post._id"
               ></Like>
               <div class="w-50 text-sec" @click.prevent="toggle(post._id)">
@@ -136,13 +183,14 @@ export default {
     return {
       posts: null,
       show: "",
+      textarea: false,
       post: "",
       image: "",
       active: false
     };
   },
   computed: {
-    ...mapState("userModule", ["isAuthenticated", "user"])
+    ...mapState("userModule", ["isAuthenticated", "authUser"])
   },
   mounted() {
     this.getFollowedPost();
@@ -158,9 +206,9 @@ export default {
     Like
   },
   methods: {
-    checkLiked: (postId, likes, userId) => {
+    checkLiked: (postId, likes, useauthUId) => {
       let hasLiked = likes.find(like => {
-        return like.author === userId && like.post._id === postId;
+        return like.author === useauthUId && like.post._id === postId;
       });
       return hasLiked;
     },
@@ -204,6 +252,21 @@ export default {
 </script>
 
 <style lang="scss">
+.btn-custom {
+  width: 4rem;
+  height: 2.5rem;
+  color: white;
+}
+.text-area1 {
+  height: 40px;
+  outline: none;
+  border: none;
+}
+.text-area-focus1 {
+  height: 80px;
+  outline: none;
+  border: none;
+}
 .main-section {
   background-color: #fff;
   color: orange red;
@@ -213,7 +276,7 @@ export default {
   background-color: white;
   width: 100%;
   padding: 1rem;
-
+  z-index: 999 !important;
   margin-bottom: 1rem;
   box-shadow: 0 2px 3px #ccc;
   border-radius: 4px;

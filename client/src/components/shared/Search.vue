@@ -4,11 +4,11 @@
       <div class="profile-bg"></div>
       <div
         class="profile-overlay"
-        v-bind:style="{ backgroundImage: 'url(' + authUser.coverImage + ')' }"
+        v-bind:style="{ backgroundImage: 'url(' + User.coverImage + ')' }"
       >&nbsp;</div>
       <div class="profile-img">
-        <div class="profile-img-1" v-if="authUser.image">
-          <img :src="authUser.image" class="img-fluid profile-img-1" alt />
+        <div class="profile-img-1" v-if="User.image">
+          <div class="profile-img-1" v-bind:style="{ backgroundImage: 'url(' + User.image + ')' }"></div>
         </div>
 
         <div class="profile-img-1" v-else>
@@ -28,10 +28,10 @@
     <div class="profile-title mb-4">
       <div class="d-flex flex-row justify-content-center align-items-center mb-2">
         <div>
-          <h2>{{authUser.firstname}} {{authUser.lastname}}</h2>
+          <h2>{{User.firstname}} {{User.lastname}}</h2>
         </div>
-        <div class="ml-3" v-if="auth !== authUser._id">
-          <Follow :following="authUser" :isFollowing="isFollowing(authUser)"></Follow>
+        <div class="ml-3" v-if="auth !== User._id">
+          <Follow :following="authUser" :isFollowing="isFollowing(User)"></Follow>
         </div>
       </div>
 
@@ -58,7 +58,7 @@
     </div>
 
     <section>
-      <div class="search-wrap container" v-if="auth === authUser._id">
+      <div class="search-wrap container" v-if="auth === User._id">
         <div class="d-flex flex-row w-100 justify-content-center align-items-center g-success">
           <div class="mr-2">
             <span style="font-size: 20px; " class="mr-2">
@@ -96,7 +96,7 @@
     </section>
 
     <section>
-      <div class="post-wrapper mb-5" v-for="post in authPost" :key="post._id">
+      <div class="post-wrapper mb-3" v-for="post in authPost" :key="post._id">
         <div class="d-flex flex-row w-100 align-items-center post-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="30" class="mr-3" viewBox="0 0 53 53">
             <path
@@ -138,7 +138,12 @@
             </div>
           </div>
           <div class="d-flex flex-row w-100 pt-2 pl-3 pr-3">
-            <Like class="w-50 text-sec" :likes="post.likes" :userId="user._id" :postId="post._id"></Like>
+            <Like
+              class="w-50 text-sec"
+              :likes="post.likes"
+              :userId="authUser._id"
+              :postId="post._id"
+            ></Like>
             <div
               class="w-50 text-sec"
               style="cursor:pointer !important;"
@@ -189,6 +194,7 @@ import Follow from "../shared/Follow";
 import Like from "../shared/Like";
 import { mapState } from "vuex";
 import { EventBus } from "@/main";
+import * as types from "../../Store/modules/types";
 
 export default {
   name: "search",
@@ -196,7 +202,7 @@ export default {
     return {
       hideLike: true,
       show: "",
-      authUser: null,
+      User: null,
       authPost: null,
       auth: "",
       comment: "",
@@ -211,18 +217,10 @@ export default {
     Like
   },
   computed: {
-    ...mapState("userModule", ["isAuthenticated", "user"])
+    ...mapState("userModule", ["isAuthenticated", "authUser", "search_id"])
   },
   created() {
-    this.auth = this.user._id;
-    EventBus.$on("updateUser", () => {
-      console.log("listening to event");
-      let instance = this;
-      setTimeout(() => {
-        instance.getUser();
-        instance.isFollowing(instance.authUser);
-      }, 2000);
-    });
+    this.auth = this.authUser._id;
   },
   mounted() {
     this.getUser();
@@ -236,7 +234,7 @@ export default {
     },
     isFollowing(following) {
       console.log(following);
-      let isFollowing = this.user.following.find(user => {
+      let isFollowing = this.authUser.following.find(user => {
         return user.user === following._id;
       });
       return isFollowing;
@@ -249,12 +247,14 @@ export default {
     },
     getUser: async function() {
       const id = this.$route.params.id;
-      const response = await apiService.GET_USER(id);
-      this.authUser = response.data;
+      let s_id = JSON.parse(localStorage.getItem("id"));
+      const response = await apiService.GET_USER(this.search_id.id);
+      this.User = response.data;
     },
     getPost: async function() {
       const id = this.$route.params.id;
-      const response = await apiService.GET_POST(id);
+      let s_id = JSON.parse(localStorage.getItem("id"));
+      const response = await apiService.GET_POST(this.search_id.id);
       this.authPost = response.data.payload;
     },
     createPost: async function() {
@@ -316,6 +316,8 @@ export default {
   cursor: pointer;
 }
 .profile-img-1 {
+  background-position: center;
+  background-size: cover;
   justify-content: center;
   width: 180px;
   height: 180px;
@@ -472,7 +474,7 @@ export default {
   background-color: white;
   width: 90%;
   padding: 1rem;
-
+  z-index: 999 !important;
   margin-bottom: 1rem;
   box-shadow: 0 2px 3px #ccc;
   border-radius: 4px;
@@ -483,5 +485,13 @@ export default {
   padding: 0.6rem;
   border-radius: 3px;
   cursor: pointer;
+}
+@media only screen and (min-width: 320px) and (max-width: 480px) {
+  .post-wrapper {
+    width: 100%;
+  }
+  .search-wrap {
+    width: 100%;
+  }
 }
 </style>

@@ -1,8 +1,11 @@
+import { parse } from "path";
+
 export default {
-    isAuthenticated: false,
-    user: null,
-    token: window.localStorage.getItem("user_token") || null,
+    isAuthenticated: localStorage.getItem("user_token") ? true : false,
+    authUser: null,
+    token: localStorage.getItem("user_token") || null,
     loading: false,
     disabled: false,
-    msg: ""
+    msg: "",
+    search_id: JSON.parse(localStorage.getItem("id")) || ""
 }

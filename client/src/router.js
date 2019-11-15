@@ -19,17 +19,17 @@ export default new Router({
           component: LandingPage
         },
         {
-          path: "login",
-          name: "Login",
-          component: () =>
-            import("./views/login.vue")
-        },
-        {
           path: "signup",
           name: "signup",
           component: () =>
             import("./views/signup.vue")
         },
+        {
+          path: "login",
+          name: "Login",
+          component: () =>
+            import("./views/login.vue")
+        }
       ]
     },
     {

@@ -9,7 +9,6 @@
     <section>
       <app-header></app-header>
     </section>
-
     <router-view />
   </div>
 </template>
@@ -52,7 +51,7 @@ export default {
       authUser.firstname = data.firstname;
       authUser.image = data.image;
       localStorage.setItem("authUser", JSON.stringify(authUser));
-      EventBus.$emit("updateImages", response.data);
+      // EventBus.$emit("updateImages", response.data);
     }
   }
 };

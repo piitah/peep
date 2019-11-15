@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import profileModule from './modules/profileModule'
 import userModule from '../Store/modules/userModule'
 
@@ -10,4 +11,9 @@ export default new Vuex.Store({
     userModule,
     profileModule
   }
+  // plugins: [
+  //   createPersistedState({
+  //     path: ["userModule.token", "userModule.isAuthenticated"]
+  //   })
+  // ]
 });

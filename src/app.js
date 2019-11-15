@@ -68,6 +68,8 @@ app.use('/follow', createFollow)
 app.use("/getPost", getPost)
 app.use("/getUser", getUser)
 app.use("/suggestion", suggestion)
+
+
 // connecting to mongodb cluster
 const db = require('../config/keys').mongoURI
 mongoose.connect(db, { useNewUrlParser: true })

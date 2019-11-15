@@ -14,6 +14,12 @@ export default {
     EventBus.$on("openSidebar", value => {
       this.show = value;
     });
+    EventBus.$on("textarea", value => {
+      this.show = value;
+    });
+    EventBus.$on("close", value => {
+      this.show = value;
+    });
   },
   methods: {
     closeSidebar: function() {
