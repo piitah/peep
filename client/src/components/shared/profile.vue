@@ -4,7 +4,7 @@
       <div class="profile-bg"></div>
       <div
         class="profile-overlay"
-        v-bind:style="{ backgroundImage: 'url(' + User.coverImage + ')' }"
+        v-bind:style="{ backgroundImage: 'url(' + authUser.coverImage + ')' }"
       >&nbsp;</div>
       <div class="cover-image">
         <div class="image-upload">
@@ -41,8 +41,11 @@
             <div class="m-loader"></div>
           </div>
         </div>
-        <div class="profile-img-1" v-if="User.image">
-          <div class="profile-img-1" v-bind:style="{ backgroundImage: 'url(' + User.image + ')' }"></div>
+        <div class="profile-img-1" v-if="authUser.image">
+          <div
+            class="profile-img-1"
+            v-bind:style="{ backgroundImage: 'url(' + authUser.image + ')' }"
+          ></div>
         </div>
 
         <div class="profile-img-1" v-else>
@@ -78,9 +81,9 @@
     <div class="profile-title mb-4">
       <div class="d-flex flex-row justify-content-center align-items-center mb-2">
         <div>
-          <h2>{{User.firstname}} {{User.lastname}}</h2>
+          <h2>{{authUser.firstname}} {{authUser.lastname}}</h2>
         </div>
-        <div class="ml-3" v-if="auth !== User._id">
+        <div class="ml-3" v-if="auth !== authUser._id">
           <button class="bt btn-pri">Follow</button>
         </div>
       </div>
@@ -91,24 +94,24 @@
       >
         <div class="text-sec">
           <span class="num">
-            <b>{{User.posts.length}}</b>
+            <b>{{authUser.posts.length}}</b>
           </span> posts
         </div>
         <div class="text-sec">
           <span class="num">
-            <b>{{User.followers.length}}</b>
+            <b>{{authUser.followers.length}}</b>
           </span> followers
         </div>
         <div class="text-sec">
           <span class="num">
-            <b>{{User.following.length}}</b>
+            <b>{{authUser.following.length}}</b>
           </span> following
         </div>
       </div>
     </div>
 
     <section style="z-index : 300 !important;">
-      <div class="search-wrap container" v-if="auth === User._id">
+      <div class="search-wrap container" v-if="auth === authUser._id">
         <div :class="textarea ? 'border-bottom' : ''">
           <div
             class="d-flex flex-row w-100 justify-content-center align-items-top"
@@ -316,8 +319,6 @@ export default {
       comment: "",
       textarea: false,
       post: "",
-      loading1: false,
-      loading2: false,
       status: false,
       finish_loading: false
     };
@@ -329,17 +330,20 @@ export default {
     Placeholder
   },
   computed: {
-    ...mapState("userModule", ["isAuthenticated", "authUser"])
+    ...mapState("userModule", [
+      "isAuthenticated",
+      "authUser",
+      "loading1",
+      "loading2"
+    ])
   },
   created() {
     this.auth = this.authUser._id;
-    this.getAuthUser();
     EventBus.$on("updateRender", event => {
       this.getAuthPost();
     });
   },
   mounted() {
-    this.getAuthUser();
     this.getAuthPost();
   },
   methods: {
@@ -364,18 +368,8 @@ export default {
       if (this.show === id) this.show = false;
       else this.show = id;
     },
-    getAuthUser: async function() {
-      const response = await userService.GET_AUTH_USER();
-      // localStorage.setItem("authUser", JSON.stringify(response.data));
-      this.User = response.data;
-      this.finish_loading = true;
-      this.loading1 = false;
-      this.loading2 = false;
-      EventBus.$emit("updateImages", response.data);
-    },
     getAuthPost: async function() {
       const response = await apiService.GET_AUTH_POST();
-      // localStorage.setItem("authPosts", JSON.stringify(response.data.payload));
       this.authPost = response.data.payload;
     },
     createPost: async function() {
@@ -385,7 +379,6 @@ export default {
       });
       this.post = "";
       this.getAuthPost();
-      this.getAuthUser();
     },
     createComment: async function(payload) {
       const response = await apiService.CREATE_COMMENT({
@@ -395,21 +388,22 @@ export default {
       this.getAuthPost();
     },
     updateCoverImage: async function(image) {
-      this.loading1 = true;
+      this.$store.commit(`userModule/${types.COVER_LOADING}`);
       const response = await userService.UPDATE_COVER_IMAGE({
         image: image
       });
-      this.getAuthUser();
+      if (response.data.status) {
+        this.$store.commit(`userModule/${types.UPDATE_COVER_IMAGE}`, image);
+      }
     },
     updateProfileImage: async function(image) {
-      this.loading2 = true;
+      this.$store.commit(`userModule/${types.PROFILE_LOADING}`);
       const response = await userService.UPDATE_PROFILE_IMAGE({
         image: image
       });
       if (response.data.status) {
         this.$store.commit(`userModule/${types.UPDATE_PROFILE_IMAGE}`, image);
       }
-      this.getAuthUser();
       this.getAuthPost();
     },
     onSelectedFile(event) {

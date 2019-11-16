@@ -39,8 +39,19 @@ export const mutations = {
         state.loading = true;
         state.disabled = true;
     },
+    [types.PROFILE_LOADING]: (state) => {
+        state.loading2 = true;
+    },
+    [types.COVER_LOADING]: (state) => {
+        state.loading1 = true;
+    },
     [types.UPDATE_PROFILE_IMAGE]: (state, payload) => {
         state.authUser.image = payload
+        state.loading2 = false;
+    },
+    [types.UPDATE_COVER_IMAGE]: (state, payload) => {
+        state.authUser.coverImage = payload
+        state.loading1 = false;
     },
     [types.SEARCH_ID]: (state, payload) => {
         localStorage.setItem("id", JSON.stringify({
@@ -55,5 +66,7 @@ export const mutations = {
         state.token = payload.token
         state.isAuthenticated = true;
         state.authUser = payload.user;
+        state.loading1 = false;
+        state.loading2 = false;
     },
 }
