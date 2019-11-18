@@ -128,7 +128,6 @@
                   <textarea
                     type="text"
                     @focus="textarea = true"
-                    @blur="textarea = false"
                     class="form-control"
                     :class="!textarea? 'text-area' : 'text-area-focus'"
                     placeholder="Add Post"
@@ -233,19 +232,6 @@
           </div>
           <div class="float-left post-h2">
             <b>...</b>
-            <div class="my-2">
-              <v-btn depressed small>Normal</v-btn>
-            </div>
-            <v-menu transition="slide-y-transition" bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn class="purple" color="primary" dark v-on="on">Slide Y Transition</v-btn>
-              </template>
-              <v-list>
-                <v-list-item>
-                  <v-list-item-title>hek</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
           </div>
         </div>
         <div class="mb-3 post-title text-left ml-4 mr-3">{{post.title}}</div>
@@ -378,6 +364,8 @@ export default {
         image: this.image
       });
       this.post = "";
+      const getAuthUser = await userService.GET_AUTH_USER();
+       this.$store.commit(`userModule/${types.GET_AUTH_USER}`, getAuthUser.data);
       this.getAuthPost();
     },
     createComment: async function(payload) {
@@ -404,7 +392,6 @@ export default {
       if (response.data.status) {
         this.$store.commit(`userModule/${types.UPDATE_PROFILE_IMAGE}`, image);
       }
-      this.getAuthPost();
     },
     onSelectedFile(event) {
       let event_instance = event;

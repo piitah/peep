@@ -167,7 +167,7 @@ import { mapState } from "vuex";
 import * as types from "../Store/modules/types";
 
 export default {
-  name: "header",
+  name: "Header",
   data() {
     return {
       handles: "",

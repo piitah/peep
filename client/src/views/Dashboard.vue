@@ -36,12 +36,12 @@
 
               <router-link to="/Dashboard/suggestion" class="user text-sec" tag="li">
                 <span>
-                  <i class="fas fa-users mr-2"></i> Developers
+                  <i class="fas fa-users mr-2"></i> Suggestions
                 </span>
               </router-link>
               <router-link to="/Dashboard" class="user text-sec" tag="li">
                 <span>
-                  <i class="fas fa-street-view mr-2"></i> Suggestions
+                  <i class="fas fa-street-view mr-2"></i> Notifications
                 </span>
               </router-link>
               <router-link to="/Dashboard" class="user text-sec" tag="li">

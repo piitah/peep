@@ -38,20 +38,10 @@ export default {
   },
   created() {
     this.tryAutoLogin();
-    this.getAuthUser();
   },
   methods: {
     tryAutoLogin: function() {
       this.$store.dispatch(`userModule/${types.TRY_AUTO_LOGIN}`);
-    },
-    getAuthUser: async function() {
-      const response = await userService.GET_AUTH_USER();
-      let data = response.data;
-      let authUser = {};
-      authUser.firstname = data.firstname;
-      authUser.image = data.image;
-      localStorage.setItem("authUser", JSON.stringify(authUser));
-      // EventBus.$emit("updateImages", response.data);
     }
   }
 };
@@ -64,6 +54,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: rgb(236, 236, 236);
+  min-height: 100vh;
 }
 .sidebar-wrapper {
   position: relative;

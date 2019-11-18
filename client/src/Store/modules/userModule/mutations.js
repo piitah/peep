@@ -62,6 +62,9 @@ export const mutations = {
     [types.CANCEL_ALL_MESSAGES]: (state) => {
         state.msg = ""
     },
+    [types.GET_AUTH_USER]: (state, payload) => {
+        state.authUser = payload
+    },
     [types.TRY_AUTO_LOGIN_SUCCESS]: (state, payload) => {
         state.token = payload.token
         state.isAuthenticated = true;

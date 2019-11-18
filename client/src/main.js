@@ -3,6 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./Store/store";
 import Vuetify from './plugins/vuetify';
+import Cloudinary from 'cloudinary-vue';
 import bootstrapVue from 'bootstrap-vue';
 import Vuelidate from 'vuelidate'
 import 'vuetify/dist/vuetify.min.css'
@@ -35,6 +36,12 @@ router.beforeEach((to, from, next) => {
 Vue.config.productionTip = false;
 Vue.use(bootstrapVue)
 Vue.use(Vuelidate)
+Vue.use(Cloudinary, {
+  configuration: {
+    cloudName: "sidmach"
+  },
+  components: ["CldImage", "CldTransformation"]
+});
 
 new Vue({
   router,

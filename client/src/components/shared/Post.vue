@@ -19,12 +19,11 @@
                     <textarea
                       type="text"
                       @focus="textarea = true"
-                      @blur="textarea = false"
                       class="form-control"
-                      :class="!textarea? 'text-area1' : 'text-area-focus1'"
                       placeholder="Add Post"
+                      height="150"
                       v-model="post"
-                      style="background-color: rgb(236, 236, 236); border: none; outline: none;"
+                      style="background-color: rgb(236, 236, 236);"
                     />
                   </div>
                 </form>

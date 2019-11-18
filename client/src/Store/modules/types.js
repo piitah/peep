@@ -49,3 +49,4 @@ export const SEARCH_ID = "SEARCH_ID"
 
 export const COVER_LOADING = "COVER_LOADING"
 export const PROFILE_LOADING = "PROFILE_LOADING"
+export const GET_AUTH_USER = "GET_AUTH_USER"

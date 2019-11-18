@@ -29,7 +29,7 @@ export const actions = {
                 context.commit(types.USER_SIGNUP_FAILED, error.response.data.message)
             })
     },
-    async [types.TRY_AUTO_LOGIN](context) {
+    async [types.TRY_AUTO_LOGIN](context, payload) {
         const token = window.localStorage.getItem("user_token")
         if (!token) {
             return router.push({ path: "/" })

@@ -1,4 +1,5 @@
 const helper = require('../helpers/helper');
+const { uploadToCloudinary } = require('../utils');
 const multer = require('multer')
 
 var storage = multer.diskStorage({
@@ -99,14 +100,24 @@ exports.loginIn = async (req, res) => {
 }
 
 exports.updateCoverImage = async (req, res) => {
-    upload(req, res, (err) => {
+    upload(req, res, async (err) => {
         if (err) {
             return res.send('no file uploaded')
         }
-
         let profileUpdate = {
         }
-        if (req.body.image) { profileUpdate.coverImage = req.body.image }
+        if (req.body.image) {
+            const stream = await req.body.image;
+            const uploadImage = await uploadToCloudinary(stream);
+
+            if (!uploadImage.secure_url) {
+                throw new Error(
+                    'Something went wrong while uploading image to Cloudinary'
+                );
+            }
+            profileUpdate.coverImage = uploadImage.secure_url;
+            profileUpdate.coverImagePublicId = uploadImage.public_id;
+        }
 
         UserModel.User.findOneAndUpdate(
             { _id: req.user.id },
@@ -124,7 +135,7 @@ exports.updateCoverImage = async (req, res) => {
     })
 }
 exports.updateProfileImage = async (req, res) => {
-    upload(req, res, (err) => {
+    upload(req, res, async (err) => {
         if (err) {
             return res.send('no file uploaded')
         }
@@ -132,7 +143,17 @@ exports.updateProfileImage = async (req, res) => {
         let profileUpdate = {
 
         }
-        if (req.body.image) { profileUpdate.image = req.body.image }
+        if (req.body.image) {
+            const stream = await req.body.image
+            const uploadImage = await uploadToCloudinary(stream);
+            if (!uploadImage.secure_url) {
+                throw new Error(
+                    'Something went wrong while uploading image to Cloudinary'
+                );
+            }
+            profileUpdate.image = uploadImage.secure_url;
+            profileUpdate.imagePublicId = uploadImage.public_id;
+        }
 
         UserModel.User.findOneAndUpdate(
             { _id: req.user.id },

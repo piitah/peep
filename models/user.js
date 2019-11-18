@@ -25,9 +25,11 @@ const UserSchema = new Schema(
         image: {
             type: String
         },
+        imagePublicId: String,
         coverImage: {
             type: String
         },
+        coverImagePublicId: String,
         posts: [
             {
                 type: Schema.Types.ObjectId,

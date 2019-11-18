@@ -2,6 +2,7 @@ const Post = require('../models/post')
 const userModel = require('../models/user')
 const Follow = require('../models/follow')
 const Comment = require('../models/comment')
+const { uploadToCloudinary } = require("../utils")
 
 const multer = require('multer')
 
@@ -139,10 +140,24 @@ exports.getfollowedpost = async (req, res) => {
 
 // Mutations
 exports.createPost = async (req, res) => {
-    upload(req, res, (err) => {
+    upload(req, res, async (err) => {
+        let update = {
+
+        }
+        if (req.body.image) {
+            const stream = await req.body.image
+            const uploadImage = await uploadToCloudinary(stream)
+            if (!uploadImage.secure_url) {
+                throw new Error(
+                    "something went wrong while uploading to cloudinary"
+                )
+            }
+            update.image = uploadImage.secure_url;
+            update.imagePublicId = uploadImage.public_id
+        }
         new Post({
             title: req.body.title,
-            image: req.body.image,
+            ...update,
             author: req.user.id
         }).save(async (err, post) => {
             // err
